@@ -1,82 +1,119 @@
-# FoodOrderingSystem
+# Food Ordering System
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A microservice-based food ordering platform built with NestJS and Nx monorepo architecture.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+## Overview
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/nest?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+This system provides a complete solution for online food ordering, managing restaurants, users, orders, and payment processing through a modular microservice architecture.
 
-## Finish your remote caching setup
+## System Architecture
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/wtFpEV2rcR)
+The application is structured as a set of independent microservices communicating with each other:
 
+- **API Gateway**: Entry point for all client requests, routing them to appropriate services
+- **User Service**: Handles user registration, authentication, and profile management
+- **Restaurant Service**: Manages restaurant details, menus, and item availability
+- **Order Service**: Processes order creation, tracking, and history
+- **Wallet Service**: Manages customer payment methods and transaction history
 
-## Run tasks
+## Technologies Used
 
-To run the dev server for your app, use:
+- **Framework**: NestJS (Node.js)
+- **Architecture**: Microservices
+- **Development Tools**: Nx Monorepo
+- **Runtime Communication**: REST APIs (with potential for message queues)
+- **Package Management**: npm
+- **Development Language**: TypeScript
 
-```sh
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v16+)
+- npm
+- Docker and Docker Compose (optional, for containerization)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd food-ordering-system
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npx nx serve api-gateway
+```
+
+### Running Individual Services
+
+Each service can be run independently:
+
+```bash
+# API Gateway
+npx nx serve api-gateway
+
+# User Service
 npx nx serve user
+
+# Restaurant Service
+npx nx serve restaurant
+
+# Order Service
+npx nx serve order
+
+# Wallet Service
+npx nx serve wallet
 ```
 
-To create a production bundle:
+## Development
 
-```sh
-npx nx build user
+### Project Structure
+
+```
+food-ordering-system/
+├── apps/
+│   ├── api-gateway/     # API Gateway service
+│   ├── user/            # User management service
+│   ├── restaurant/      # Restaurant management service
+│   ├── order/           # Order processing service
+│   └── wallet/          # Payment processing service
+├── libs/
+│   ├── common/          # Shared utilities and models
+│   └── rmq/             # RabbitMQ configurations (if used)
+├── docker-compose.yml   # Docker configuration
+└── package.json         # Project dependencies
 ```
 
-To see all available targets to run for a project, run:
+### Adding Features
 
-```sh
-npx nx show project user
+To create a new feature:
+
+```bash
+npx nx g @nx/nest:resource --project=<service-name> --directory=app --name=<feature-name>
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## Deployment
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+The services can be containerized and deployed using Docker:
 
-## Add new projects
+```bash
+# Build Docker images
+docker-compose build
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/nest:app demo
+# Start all services
+docker-compose up
 ```
 
-To generate a new library, use:
+## License
 
-```sh
-npx nx g @nx/node:lib mylib
-```
+MIT
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/nest?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
+Created as part of the Software Architecture & Design Pattern coursework at Islington College - April 2025.

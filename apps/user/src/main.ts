@@ -8,6 +8,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 
 async function bootstrap() {
+  const nodeEnv = process.env.NODE_ENV || 'dev';
+  const appName = process.env.APP_NAME || 'Auth & User';
+
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);

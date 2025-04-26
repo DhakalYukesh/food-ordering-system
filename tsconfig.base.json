@@ -14,7 +14,10 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@food-ordering-system/common": ["libs/common/src/index.ts"],
+      "@food-ordering-system/configs": ["libs/configs/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
