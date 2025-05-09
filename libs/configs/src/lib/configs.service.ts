@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService as NestConfigService } from '@nestjs/config';
 import { AppConfigSub, JWTConfig } from './interfaces/config.interface';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 @Injectable()
 export class ConfigService {
@@ -8,6 +9,14 @@ export class ConfigService {
 
   getAppConfig() {
     return this.configService.get<AppConfigSub>('appConfig');
+  }
+
+   getTypeOrmConfig(): TypeOrmModuleOptions {
+    const dbConfig = this.configService.get('database');
+
+    return {
+      ...dbConfig,
+    };
   }
 
   getDatabaseConfig() {

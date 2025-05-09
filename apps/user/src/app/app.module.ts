@@ -22,7 +22,7 @@ import { UserManagementModule } from '../user-management/user-management.module'
       imports: [FoodOrderConfigModule],
       inject: [FoodOrderConfigService],
       useFactory: async (configService: FoodOrderConfigService) => {
-        return configService.getDatabaseConfig();
+        return configService.getTypeOrmConfig();
       },
     }),
     // TODO: Add Rmq registration 
