@@ -5,11 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user-management/entities/user.entity';
 import { UserAddress } from '../user-management/entities/address.entity';
 import { LoggerModule } from '@food-ordering-system/common';
+import { UserSession } from './entities/session.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, UserAddress]),
-    LoggerModule
+    TypeOrmModule.forFeature([User, UserAddress, UserSession]),
+    LoggerModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],

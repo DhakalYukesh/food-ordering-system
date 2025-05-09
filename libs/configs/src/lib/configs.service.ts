@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService as NestConfigService } from '@nestjs/config';
-import { AppConfigSub } from './interfaces/config.interface';
+import { AppConfigSub, JWTConfig } from './interfaces/config.interface';
 
 @Injectable()
 export class ConfigService {
@@ -19,7 +19,7 @@ export class ConfigService {
   }
 
   getJwtConfig() {
-    const jwtConfig = this.configService.get('jwtConfig');
+    const jwtConfig = this.configService.get<JWTConfig>('jwtConfig');
 
     if (!jwtConfig) {
       throw new Error('JWT config not found');

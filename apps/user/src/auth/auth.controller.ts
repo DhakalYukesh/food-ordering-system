@@ -1,5 +1,6 @@
 import {
   LoggerService,
+  UserLoginDto,
   UserRegistrationDto,
 } from '@food-ordering-system/common';
 import { Body, Controller, Post } from '@nestjs/common';
@@ -19,5 +20,12 @@ export class AuthController {
     this.logger.log(`Registering user: ${JSON.stringify(userRegistrationDto)}`);
 
     return this.authService.registerUserAsync(userRegistrationDto);
+  }
+
+  @Post('login')
+  loginUser(@Body() userLoginDto: UserLoginDto) {
+    this.logger.log(`Logging in user: ${JSON.stringify(userLoginDto)}`);
+
+    return this.authService.loginUserAsync(userLoginDto);
   }
 }

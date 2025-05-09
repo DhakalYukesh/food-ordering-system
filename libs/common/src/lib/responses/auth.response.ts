@@ -12,3 +12,9 @@ export type RegisterResponse = {
     country: string;
   };
 };
+
+export type JWTResponse = {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: string;
+}

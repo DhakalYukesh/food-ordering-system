@@ -21,9 +21,9 @@ export interface DatabaseConfig {
   logging: string[];
 }
 
-export interface JwtConfig {
+export interface JWTConfig {
   jwtAccessSecret: string;
   jwtRefreshSecret: string;
-  jwtAccessExpiresIn: string;
-  jwtRefreshExpiresIn: string;
+  jwtAccessExpiration: string;
+  jwtRefreshExpiration: string;
 }
