@@ -7,5 +7,5 @@ export const appConfig = registerAs<AppConfigSub>('appConfig', () => ({
   version: process.env['VERSION'] || '1.0.0',
   node_env: (process.env['NODE_ENV'] as 'dev' | 'prod' | 'test') || 'dev',
   app_string: process.env['APP_STRING'] || 'http://localhost:8090',
-  app_prefix: process.env['APP_PREFIX'] || 'api',
+  app_prefix: process.env['APP_PREFIX'] || 'api/v1',
 }));
