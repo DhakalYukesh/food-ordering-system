@@ -1,30 +1,53 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, Matches, IsIn } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+  IsStrongPassword,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { UserRole } from '../../enums';
+import { UserAddressDto } from './address.dto';
 
-export class RegisterDto {
-  @IsEmail({}, { message: 'Invalid email' })
-  @IsNotEmpty({ message: 'Email is required' })
-  email!: string;
-  
+export class UserRegistrationDto {
   @IsString()
-  @IsNotEmpty({ message: 'Password is required' })
-  @MinLength(8, { message: 'Password must be at least 8 characters long' })
-  password!: string;
-  
-  @IsString()
-  @IsNotEmpty({ message: 'Name is required' })
-  name!: string;
-  
-  @IsString()
-  @IsNotEmpty({ message: 'Phone number is required' })
-  @Matches(/^\+?[0-9\s-]{8,}$/, { message: 'Invalid phone number format' })
-  phone!: string;
-  
-  @IsString()
-  @IsNotEmpty({ message: 'Address is required' })
-  address!: string;
+  @IsNotEmpty()
+  firstName: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'Role is required' })
-  @IsIn(['customer', 'seller', 'admin'], { message: 'Role must be included' })
-  role!: string;
+  @IsNotEmpty()
+  lastName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsStrongPassword({
+    minLength: 8,
+    minNumbers: 1,
+    minSymbols: 1,
+    minUppercase: 1,
+  })
+  @IsNotEmpty()
+  password: string;
+
+  @IsPhoneNumber()
+  @IsNotEmpty()
+  phone: string;
+
+  @IsString()
+  @IsNotEmpty()
+  userName: string;
+
+  @IsEnum(UserRole)
+  @IsNotEmpty()
+  role: UserRole;
+
+  @ValidateNested()
+  @Type(() => UserAddressDto)
+  @IsNotEmpty()
+  address: UserAddressDto;
 }

@@ -35,7 +35,7 @@ export class LoggerService implements NestLoggerService {
             format.timestamp(),
             format.printf(({ timestamp, level, message }) => {
               return `${timestamp} [${appConfig.app_name}:${
-                this.context && this.context
+                this.context ? this.context : 'app'
               }] ${level} : ${message}`;
             })
           ),
@@ -61,7 +61,7 @@ export class LoggerService implements NestLoggerService {
   }
 
   log(message: string, context?: string): void {
-    this.logger.info(message, context);
+    this.logger.info(message, { context });
   }
 
   error(message: string, trace?: string, context?: string): void {

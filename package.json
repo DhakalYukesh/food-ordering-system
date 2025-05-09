@@ -2,7 +2,12 @@
   "name": "@food-ordering-system/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build:user": "nx build user",
+    "start:user": "nx serve user",
+    "build:all": "nx run-many --target=build --all",
+    "start:dev": "nx serve"
+  },
   "private": true,
   "dependencies": {
     "@nestjs/common": "^10.0.2",
@@ -14,6 +19,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "nest-winston": "^1.10.2",
+    "pg": "^8.15.6",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
     "typeorm": "^0.3.22",

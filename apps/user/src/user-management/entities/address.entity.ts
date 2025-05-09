@@ -1,7 +1,9 @@
-import { Column, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
+import { BaseEntity } from '@food-ordering-system/common';
 
-export class UserAddress {
+@Entity('UserAddress')
+export class UserAddress extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -17,7 +19,7 @@ export class UserAddress {
   @Column({ length: 100 })
   country: string;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, (user) => user.address, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 }
