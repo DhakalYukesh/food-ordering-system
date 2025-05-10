@@ -6,3 +6,5 @@ export * from './lib/enums';
 export * from './lib/responses';
 export * from './lib/controls';
 export * from './lib/constants';
+export * from './lib/guards';
+export * from './lib/decorator';

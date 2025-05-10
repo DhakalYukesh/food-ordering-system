@@ -7,6 +7,7 @@ import {
   ConfigService as FoodOrderConfigService,
 } from '@food-ordering-system/configs';
 import { JwtServiceName } from '../constants';
+import { JwtStrategy } from '../strategies/jwt.strategy';
 
 @Module({})
 export class BaseControlModule {
@@ -42,7 +43,7 @@ export class BaseControlModule {
         }),
       ],
       providers: [
-        // TODO: Add custom JWT strategy
+        JwtStrategy,
         {
           provide: JwtServiceName.JWT_ACCESS_SERVICE,
           useFactory: (jwtService: JwtService) => jwtService,
