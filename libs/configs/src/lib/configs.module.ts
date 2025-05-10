@@ -3,12 +3,13 @@ import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import { appConfig } from './configurations/app-config';
 import { ConfigService } from './configs.service';
 import { databaseConfig } from './configurations/database-config';
+import { jwtConfig } from './configurations/jwt-config';
 
 @Module({
   imports: [
     NestConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig],
+      load: [appConfig, databaseConfig, jwtConfig],
     }),
   ],
   providers: [ConfigService],
