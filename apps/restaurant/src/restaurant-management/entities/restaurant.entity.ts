@@ -1,12 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  ManyToOne,
-  JoinColumn
-} from 'typeorm';
-import { Category } from './category.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { BaseEntity } from '@food-ordering-system/common';
 import { FoodItem } from '../../foodItem/entities/food-item.entity';
 
@@ -29,13 +21,6 @@ export class Restaurant extends BaseEntity {
 
   @Column()
   ownerId: string;
-
-  @Column()
-  categoryId: string;
-
-  @ManyToOne(() => Category, category => category.restaurants)
-  @JoinColumn({ name: 'categoryId' })
-  category: Category;
 
   @OneToMany(() => FoodItem, (foodItem) => foodItem.restaurant)
   foodItems: FoodItem[];

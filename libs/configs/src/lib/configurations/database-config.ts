@@ -14,4 +14,8 @@ export const databaseConfig = registerAs('databaseConfig', () => ({
   logging: process.env['NODE_ENV'] === 'dev' ? ['error', 'warn'] : false,
   synchronize: true,
   autoLoadEntities: true,
+  // Add retry connection logic
+  retryAttempts: 10,
+  retryDelay: 5000, // 5 seconds
+  keepConnectionAlive: true,
 }));

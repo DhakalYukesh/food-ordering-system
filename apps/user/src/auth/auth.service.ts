@@ -70,7 +70,7 @@ export class AuthService {
 
       const user = new User();
       Object.assign(user, userRegistrationDto);
-      user.password = hashedPassword; // Save the hashed password instead of plaintext
+      user.password = hashedPassword;
       user.address = userAddress;
 
       // Step 4: Save the user, which will cascade save the address

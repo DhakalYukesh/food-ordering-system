@@ -26,7 +26,7 @@ export class RestaurantManagementController {
   }
 
   @Post()
-  @CheckAccess([HasRole.CUSTOMER, HasRole.RESTAURANT_OWNER])
+  @CheckAccess([HasRole.RESTAURANT_OWNER, HasRole.ADMIN])
   createRestaurant(
     @CurrentUser('sub') ownerId: string,
     @Body() createRestaurantDto: CreateRestaurantDto
@@ -42,21 +42,22 @@ export class RestaurantManagementController {
   }
 
   @Get()
-  findAllRestaurants() {
+  async findAllRestaurants() {
     this.logger.log('Fetching all restaurants');
 
     return this.restaurantManagementService.findAllRestaurantsAsync();
   }
 
   @Get(':id')
-  findOneRestaurant(@Param('id') id: string) {
+  async findOneRestaurant(@Param('id') id: string) {
     this.logger.log(`Fetching restaurant with id: ${id}`);
 
     return this.restaurantManagementService.findOneRestaurantAsync(id);
   }
 
   @Put(':id')
-  updateRestaurant(
+  @CheckAccess([HasRole.RESTAURANT_OWNER, HasRole.ADMIN])
+  async updateRestaurant(
     @Param('id') id: string,
     @Body() updateRestaurantDto: Partial<CreateRestaurantDto>
   ) {
@@ -71,7 +72,8 @@ export class RestaurantManagementController {
   }
 
   @Delete(':id')
-  deleteRestaurant(@Param('id') id: string) {
+  @CheckAccess([HasRole.RESTAURANT_OWNER, HasRole.ADMIN])
+  async deleteRestaurant(@Param('id') id: string) {
     this.logger.log(`Deleting restaurant with id: ${id}`);
 
     return this.restaurantManagementService.deleteRestaurantAsync(id);
