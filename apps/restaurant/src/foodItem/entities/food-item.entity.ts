@@ -25,6 +25,9 @@ export class FoodItem extends BaseEntity {
   @Column({ default: true })
   isAvailable: boolean;
 
+  @Column({ default: 0 })
+  stock: number;
+
   @Column()
   restaurantId: string;
 

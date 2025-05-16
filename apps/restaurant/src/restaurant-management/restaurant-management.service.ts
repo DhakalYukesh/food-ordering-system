@@ -105,35 +105,37 @@ export class RestaurantManagementService {
     id: string
   ): Promise<SuccessResponse<Restaurant>> {
     try {
-      this.logger.log(`Fetching restaurant with ID: ${id}`);
+      this.logger.log(`Fetching restaurant with id: ${id}`);
 
-      // Step 1: Query the database for the specific restaurant
+      // Step 1: Fetch restaurant with its associated food items
       const restaurant = await this.restaurantRepository.findOne({
-        where: { id, isActive: true },
+        where: { id },
+        relations: ['foodItems'],
       });
 
-      // Step 2: Check if restaurant exists
       if (!restaurant) {
-        this.logger.warn(`Restaurant with ID ${id} not found`);
         throw new NotFoundException(`Restaurant with ID ${id} not found`);
       }
 
-      this.logger.log(`Found restaurant: ${restaurant.name}`);
+      // Step 2: Filter out unavailable food items
+      if (restaurant.foodItems) {
+        restaurant.foodItems = restaurant.foodItems.filter(
+          (item) => item.isAvailable
+        );
+      }
 
-      // Step 3: Return the restaurant with success response
+      this.logger.log(`Restaurant ${restaurant.name} fetched successfully`);
+
       return {
         statusCode: 200,
-        message: 'Restaurant retrieved successfully',
+        message: 'Restaurant fetched successfully',
         data: restaurant,
       };
     } catch (error) {
       this.logger.error(
-        `Error fetching restaurant with ID ${id}: ${error.message}`,
-        error.stack
+        `Failed to fetch restaurant with ID ${id}: ${error.message}`
       );
-      throw new NotFoundException(
-        `Error fetching restaurant with ID ${id}: ${error.message}`
-      );
+      throw error;
     }
   }
 

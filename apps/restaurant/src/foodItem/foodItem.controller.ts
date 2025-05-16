@@ -6,52 +6,98 @@ import {
   Param,
   Put,
   Delete,
+  Query,
 } from '@nestjs/common';
-import { CreateFoodItemDto } from '@food-ordering-system/common';
+import {
+  CheckAccess,
+  CreateFoodItemDto,
+  HasRole,
+  LoggerService,
+} from '@food-ordering-system/common';
 import { FoodItemService } from './foodItem.service';
-import { FoodItem } from './entities/food-item.entity';
 
 @Controller('restaurants/:restaurantId/food-items')
 export class FoodItemController {
-  constructor(private readonly foodItemService: FoodItemService) {}
+  constructor(
+    private readonly logger: LoggerService,
+    private readonly foodItemService: FoodItemService
+  ) {
+    this.logger.setContext(FoodItemController.name);
+  }
 
   @Post()
-  async create(
+  @CheckAccess([HasRole.RESTAURANT_OWNER, HasRole.ADMIN])
+  createFoodItemForARestaurant(
     @Param('restaurantId') restaurantId: string,
     @Body() createFoodItemDto: CreateFoodItemDto
-  ): Promise<FoodItem> {
-    return this.foodItemService.create(restaurantId, createFoodItemDto);
+  ) {
+    this.logger.log(
+      `Creating food item with name: ${createFoodItemDto.name} for restaurant: ${restaurantId}`
+    );
+
+    return this.foodItemService.createFoodItemForARestaurantAsync(
+      restaurantId,
+      createFoodItemDto
+    );
   }
 
   @Get()
-  async findAll(
-    @Param('restaurantId') restaurantId: string
-  ): Promise<FoodItem[]> {
-    return this.foodItemService.findAll(restaurantId);
+  findAllFoodItemsForARestaurant(@Param('restaurantId') restaurantId: string) {
+    this.logger.log(`Fetching all food items for restaurant: ${restaurantId}`);
+
+    return this.foodItemService.findAllFoodItemsForARestaurantAsync(
+      restaurantId
+    );
   }
 
-  @Get(':id')
-  async findOne(
+  @Get('search')
+  findOneFoodItemForARestaurant(
     @Param('restaurantId') restaurantId: string,
-    @Param('id') id: string
-  ): Promise<FoodItem> {
-    return this.foodItemService.findOne(restaurantId, id);
+    @Query('id') id?: string,
+    @Query('name') name?: string
+  ) {
+    this.logger.log(
+      `Searching for food item(s) in restaurant: ${restaurantId}, name: ${name}, id: ${id}`
+    );
+
+    return this.foodItemService.findOneFoodItemForARestaurantAsync(
+      restaurantId,
+      id,
+      name
+    );
   }
 
   @Put(':id')
-  async update(
+  @CheckAccess([HasRole.RESTAURANT_OWNER, HasRole.ADMIN])
+  updateFoodItemForARestaurant(
     @Param('restaurantId') restaurantId: string,
     @Param('id') id: string,
     @Body() updateFoodItemDto: Partial<CreateFoodItemDto>
-  ): Promise<FoodItem> {
-    return this.foodItemService.update(restaurantId, id, updateFoodItemDto);
+  ) {
+    this.logger.log(
+      `Updating food item with id: ${id} for restaurant: ${restaurantId}`
+    );
+
+    return this.foodItemService.updateFoodItemForARestaurantAsync(
+      restaurantId,
+      id,
+      updateFoodItemDto
+    );
   }
 
   @Delete(':id')
-  async remove(
+  @CheckAccess([HasRole.RESTAURANT_OWNER, HasRole.ADMIN])
+  removeFoodItemForARestaurant(
     @Param('restaurantId') restaurantId: string,
     @Param('id') id: string
-  ): Promise<void> {
-    return this.foodItemService.remove(restaurantId, id);
+  ) {
+    this.logger.log(
+      `Deleting food item with id: ${id} for restaurant: ${restaurantId}`
+    );
+
+    return this.foodItemService.removeFoodItemForARestaurantAsync(
+      restaurantId,
+      id
+    );
   }
 }

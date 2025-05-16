@@ -11,5 +11,11 @@ export class CreateFoodItemDto {
 
   @IsNumber()
   @Min(0)
+  @IsNotEmpty()
   price: number;
+
+  @IsNumber()
+  @Min(0)
+  @IsNotEmpty()
+  stock: number;
 }

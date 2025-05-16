@@ -8,7 +8,7 @@ import {
 } from '@food-ordering-system/configs';
 import { BaseControlModule, LoggerModule } from '@food-ordering-system/common';
 import { RestaurantManagementModule } from '../restaurant-management/restaurant-management.module';
-// import { FoodItemModule } from '../foodItem/foodItem.module';
+import { FoodItemModule } from '../foodItem/foodItem.module';
 
 @Module({
   imports: [
@@ -28,7 +28,7 @@ import { RestaurantManagementModule } from '../restaurant-management/restaurant-
     // TODO: Add Rmq registration 
     // Modules
     RestaurantManagementModule,
-    // FoodItemModule,
+    FoodItemModule,
   ],
   controllers: [AppController],
   providers: [AppService],
