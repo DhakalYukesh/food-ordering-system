@@ -8,3 +8,6 @@ export * from './lib/controls';
 export * from './lib/constants';
 export * from './lib/guards';
 export * from './lib/decorator';
+export * from './lib/rabbitmq';
+export * from './lib/filters/rpc-exception.filter';
+export * from './lib/interceptors/rpc-transform.interceptor';

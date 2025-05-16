@@ -3,10 +3,15 @@
  * This is only a minimal backend to get started.
  */
 
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
-import { createWinstonLogger } from '@food-ordering-system/common';
+import {
+  AllExceptionsFilter,
+  createWinstonLogger,
+  LoggerService,
+  RpcTransformInterceptor,
+} from '@food-ordering-system/common';
 import { ConfigService } from '@food-ordering-system/configs';
 
 async function bootstrap() {
@@ -17,10 +22,13 @@ async function bootstrap() {
     logger: createWinstonLogger(appName, nodeEnv),
   });
 
-  const logger = new Logger();
+  const logger = app.get(LoggerService);
   const configService = app.get(ConfigService);
   const { port, app_prefix } = configService.getAppConfig();
 
+  // Set up global interceptors and filters
+  app.useGlobalInterceptors(new RpcTransformInterceptor(logger));
+  app.useGlobalFilters(new AllExceptionsFilter(logger));
   app.enableCors();
   app.setGlobalPrefix(app_prefix);
 
@@ -30,7 +38,7 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
-    }),
+    })
   );
 
   await app.listen(port);

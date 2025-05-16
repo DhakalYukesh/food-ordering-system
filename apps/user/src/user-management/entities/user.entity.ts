@@ -37,7 +37,7 @@ export class User extends BaseEntity {
     eager: true
   })
   address: UserAddress;
-
-//   @OneToOne(() => UserWallet, (wallet) => wallet.user, { cascade: true })
-//   walletId: string;
+  
+  @Column({ name: 'walletId', nullable: true })
+  walletId: string;
 }

@@ -17,7 +17,8 @@
     "baseUrl": ".",
     "paths": {
       "@food-ordering-system/common": ["libs/common/src/index.ts"],
-      "@food-ordering-system/configs": ["libs/configs/src/index.ts"]
+      "@food-ordering-system/configs": ["libs/configs/src/index.ts"],
+      "@food-ordering-system/rmq": ["rmq/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

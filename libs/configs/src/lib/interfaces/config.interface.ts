@@ -27,3 +27,8 @@ export interface JWTConfig {
   jwtAccessExpiration: string;
   jwtRefreshExpiration: string;
 }
+
+export interface RabbitMQConfig {
+  uri: string;
+  queues: Record<string, string>;
+}

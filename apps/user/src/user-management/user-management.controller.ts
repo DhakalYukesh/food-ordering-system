@@ -1,7 +1,22 @@
-import { LoggerService } from '@food-ordering-system/common';
+import { Controller, Get, Param } from '@nestjs/common';
+import { UserManagementService } from './user-management.service';
+import { CheckAccess, CurrentUser, HasRole } from '@food-ordering-system/common';
 
+@Controller('users')
 export class UserManagementController {
-  constructor(private readonly logger: LoggerService) {
-    this.logger.setContext(UserManagementController.name);
+  constructor(
+    private readonly userManagementService: UserManagementService,
+  ) {}
+  
+  @Get('me/profile')
+  @CheckAccess()
+  async getMyProfile(@CurrentUser('sub') userId: string) {
+    return this.userManagementService.getUserWithWallet(userId);
+  }
+
+  @Get(':id/profile')
+  @CheckAccess([HasRole.ADMIN])
+  async getUserProfile(@Param('id') userId: string) {
+    return this.userManagementService.getUserWithWallet(userId);
   }
 }

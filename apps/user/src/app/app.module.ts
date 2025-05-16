@@ -5,10 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   ConfigsModule as FoodOrderConfigModule,
   ConfigService as FoodOrderConfigService,
-} from '@food-ordering-system/configs';
-import { BaseControlModule, LoggerModule } from '@food-ordering-system/common';
+} from '@food-ordering-system/configs'; 
+import {
+  BaseControlModule,
+  LoggerModule,
+  AllExceptionsFilter
+} from '@food-ordering-system/common';
 import { AuthModule } from '../auth/auth.module';
 import { UserManagementModule } from '../user-management/user-management.module';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -25,12 +30,17 @@ import { UserManagementModule } from '../user-management/user-management.module'
         return configService.getDatabaseConfig();
       },
     }),
-    // TODO: Add Rmq registration 
-    // Modules
+
     AuthModule,
     UserManagementModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    }
+  ],
 })
 export class AppModule {}
