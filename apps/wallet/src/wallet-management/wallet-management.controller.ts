@@ -1,33 +1,55 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { WalletManagementService } from './wallet-management.service';
-import { CreateWalletDto, TransactionDto } from '@food-ordering-system/common';
+import {
+  LoggerService,
+  CreateWalletDto,
+  TransactionDto,
+} from '@food-ordering-system/common';
 
 @Controller('wallet')
 export class WalletManagementController {
-  constructor(private readonly walletManagementService: WalletManagementService) {}
+  constructor(
+    private readonly logger: LoggerService,
+    private readonly walletManagementService: WalletManagementService
+  ) {
+    this.logger.setContext(WalletManagementController.name);
+  }
 
   @Post()
-  async createWallet(@Body() createWalletDto: CreateWalletDto) {
-    return this.walletManagementService.createWallet(createWalletDto);
+  createWallet(@Body() createWalletDto: CreateWalletDto) {
+    this.logger.log(`Creating wallet for user: ${createWalletDto.userId}`);
+
+    return this.walletManagementService.createWalletAsync(createWalletDto);
   }
 
   @Get('user/:userId')
-  async getWalletByUserId(@Param('userId') userId: string) {
-    return this.walletManagementService.getWalletByUserId(userId);
+  getWalletByUserId(@Param('userId') userId: string) {
+    this.logger.log(`Getting wallet for user: ${userId}`);
+
+    return this.walletManagementService.getWalletByUserIdAsync(userId);
   }
 
   @Get(':id')
-  async getWalletById(@Param('id') id: string) {
-    return this.walletManagementService.getWalletById(id);
+  getWalletById(@Param('id') id: string) {
+    this.logger.log(`Getting wallet by ID: ${id}`);
+
+    return this.walletManagementService.getWalletByIdAsync(id);
   }
 
   @Get(':id/transactions')
-  async getTransactionHistory(@Param('id') walletId: string) {
-    return this.walletManagementService.getTransactionHistory(walletId);
+  getTransactionHistory(@Param('id') walletId: string) {
+    this.logger.log(`Getting transaction history for wallet: ${walletId}`);
+
+    return this.walletManagementService.getTransactionHistoryAsync(walletId);
   }
 
   @Post('transaction')
   async processTransaction(@Body() transactionDto: TransactionDto) {
-    return this.walletManagementService.processTransaction(transactionDto);
+    this.logger.log(
+      `Processing transaction for wallet: ${transactionDto.walletId}`
+    );
+
+    // Delegate to wallet service which will then use the transaction service
+    return this.walletManagementService.processTransactionAsync(transactionDto);
   }
 }

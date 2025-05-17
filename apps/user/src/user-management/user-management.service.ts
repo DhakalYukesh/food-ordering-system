@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { WalletRmqCommunication } from '../rmq-communicate/wallet.communicate';
+import { WalletRmqCommunication } from '../rmq-communication/wallet.communicate';
 import { LoggerService } from '@food-ordering-system/common';
 
 @Injectable()

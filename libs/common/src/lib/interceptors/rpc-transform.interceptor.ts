@@ -12,11 +12,7 @@ export class RpcTransformInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map(data => {
-        return {
-          success: true,
-          data,
-          timestamp: new Date().toISOString()
-        };
+        return data;
       }),
     );
   }

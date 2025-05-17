@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Transaction } from './transaction.entity';
 import { BaseEntity } from '@food-ordering-system/common';
+import { Transaction } from '../../transaction-management/entities/transaction.entity';
 
 @Entity("Wallet")
 export class Wallet extends BaseEntity {

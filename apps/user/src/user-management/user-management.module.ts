@@ -4,7 +4,7 @@ import { UserManagementController } from './user-management.controller';
 import { UserManagementService } from './user-management.service';
 import { User } from './entities/user.entity';
 import { UserAddress } from './entities/address.entity';
-import { RmqCommunicateModule } from '../rmq-communicate/rmq-communicate.module';
+import { RmqCommunicateModule } from '../rmq-communication/rmq-communicate.module';
 
 @Module({
   imports: [

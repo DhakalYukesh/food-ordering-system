@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Wallet } from './wallet.entity';
+import { Wallet } from '../../wallet-management/entities/wallet.entity';
 import { TransactionType, TransactionStatus, BaseEntity } from '@food-ordering-system/common';
 
 @Entity("Transactions")

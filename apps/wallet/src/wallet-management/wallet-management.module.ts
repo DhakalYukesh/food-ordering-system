@@ -1,19 +1,23 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Wallet } from './entities/wallet.entity';
-import { Transaction } from './entities/transaction.entity';
 import { WalletManagementController } from './wallet-management.controller';
 import { WalletManagementService } from './wallet-management.service';
-import { WalletManagementRpcController } from './rmq-communication/wallet-management-rpc.controller';
-import { RmqModule, LoggerModule } from '@food-ordering-system/common';
+import { LoggerModule } from '@food-ordering-system/common';
+import { RmqCommunicateModule } from '../rmq-communication/rmq-communicate.module';
+import { TransactionManagementModule } from '../transaction-management/transaction-management.module';
+import { Transaction } from '../transaction-management/entities/transaction.entity';
 
-@Module({
+@Module({  
   imports: [
     TypeOrmModule.forFeature([Wallet, Transaction]),
-    RmqModule,
     LoggerModule,
+    forwardRef(() => RmqCommunicateModule),
+    forwardRef(() => TransactionManagementModule),
   ],
-  controllers: [WalletManagementController, WalletManagementRpcController],
+  controllers: [
+    WalletManagementController
+  ],
   providers: [WalletManagementService],
   exports: [WalletManagementService],
 })

@@ -30,13 +30,11 @@ async function bootstrap() {
   const rmqService = app.get(RmqService);
   const { port, app_prefix } = configService.getAppConfig();
 
-  // Set up global interceptors and filters
-  app.useGlobalInterceptors(new RpcTransformInterceptor(logger));
-  app.useGlobalFilters(new AllExceptionsFilter(logger));
+  // HTTP related settings
   app.enableCors();
   app.setGlobalPrefix(app_prefix);
 
-  // Apply ValidationPipe globally to enable DTO validation
+  // Shared settings (for both HTTP and RPC)
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -45,28 +43,26 @@ async function bootstrap() {
     })
   );
 
-  // Global interceptor for RPC responses
-  app.useGlobalInterceptors(new RpcTransformInterceptor(logger));
-
-  // Global filter for RPC exceptions
+  // Handle both HTTP exceptions and RPC exceptions
   app.useGlobalFilters(new AllExceptionsFilter(logger));
 
-  // Setup RabbitMQ listener
+  // Transform both HTTP and RPC responses
+  app.useGlobalInterceptors(new RpcTransformInterceptor(logger));
+
+  // Setup RabbitMQ listener for RPC
   const microserviceOptions: MicroserviceOptions = rmqService.getOptions(
     RMQServiceNames.WALLET_SERVICE
   );
   app.connectMicroservice(microserviceOptions, {
     inheritAppConfig: true,
   });
+
+  // Start both services
   await app.startAllMicroservices();
   logger.log('Wallet microservice is listening for RPC calls');
 
   await app.listen(port);
   logger.log(`Application is running on: ${await app.getUrl()}`);
 }
-
-process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled Rejection:', reason);
-});
 
 bootstrap();

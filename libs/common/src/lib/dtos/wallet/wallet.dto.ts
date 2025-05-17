@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsString, IsOptional, IsNumber, Min, IsEnum } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsNumber,
+  Min,
+  IsEnum,
+  IsUUID,
+} from 'class-validator';
 import { TransactionType } from '../../enums';
 
 export class CreateWalletDto {
@@ -10,6 +18,16 @@ export class CreateWalletDto {
   @IsNumber()
   @Min(0)
   initialBalance?: number;
+}
+
+export class WalletBalanceDto {
+  @IsNotEmpty()
+  @IsUUID()
+  walletId: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  balance: number;
 }
 
 export class TransactionDto {

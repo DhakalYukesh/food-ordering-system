@@ -1,4 +1,4 @@
-import { Controller, NotFoundException } from '@nestjs/common';
+import { Controller, Inject, forwardRef } from '@nestjs/common';
 import {
   MessagePattern,
   Payload,
@@ -6,14 +6,13 @@ import {
   RmqContext,
   RpcException,
 } from '@nestjs/microservices';
-import { WalletManagementService } from '../wallet-management.service';
-import { CreateWalletDto, WalletMessagePatterns } from '@food-ordering-system/common';
-import { RmqService } from '@food-ordering-system/common';
-import { LoggerService } from '@food-ordering-system/common';
+import { WalletManagementService } from '../wallet-management/wallet-management.service';
+import { LoggerService, RmqService, WalletMessagePatterns, CreateWalletDto } from '@food-ordering-system/common';
 
 @Controller()
 export class WalletManagementRpcController {
   constructor(
+    @Inject(forwardRef(() => WalletManagementService))
     private readonly walletManagementService: WalletManagementService,
     private readonly rmqService: RmqService,
     private readonly logger: LoggerService
@@ -30,7 +29,7 @@ export class WalletManagementRpcController {
     this.rmqService.acknowledgeMessage(context);
 
     try {
-      const wallet = await this.walletManagementService.getWalletByUserId(userId);
+      const wallet = await this.walletManagementService.getWalletByUserIdAsync(userId);
       return wallet;
     } catch (error) {
       this.logger.error(`Error getting wallet: ${error.message}`);
@@ -48,7 +47,7 @@ export class WalletManagementRpcController {
     this.rmqService.acknowledgeMessage(context);
 
     try {
-      const wallet = await this.walletManagementService.createWallet(createWalletDto);
+      const wallet = await this.walletManagementService.createWalletAsync(createWalletDto);
       return wallet;
     } catch (error) {
       this.logger.error(`Error creating wallet: ${error.message}`);

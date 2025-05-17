@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigsModule } from '@food-ordering-system/configs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@food-ordering-system/configs';
-import { LoggerModule, RmqModule } from '@food-ordering-system/common';
+import { LoggerModule } from '@food-ordering-system/common';
 import { WalletManagementModule } from './wallet-management/wallet-management.module';
 
 @Module({
@@ -14,7 +14,6 @@ import { WalletManagementModule } from './wallet-management/wallet-management.mo
       inject: [ConfigService],
     }),
     LoggerModule,
-    RmqModule,
     WalletManagementModule,
   ],
 })

@@ -6,10 +6,11 @@ export interface RabbitMQConfig {
 }
 
 export const rabbitmqConfig = registerAs('rabbitmqConfig', (): RabbitMQConfig => ({
-  uri: process.env["RABBITMQ_URI"] || 'amqp://localhost:5672',
+  uri: process.env["RABBITMQ_URI"] || 'amqp://guest:guest@localhost:5672',
   queues: {
-    WALLET_SERVICE: process.env["RABBITMQ_WALLET_SERVICE_QUEUE"] || 'wallet_service_queue',
-    USER_SERVICE: process.env["RABBITMQ_USER_SERVICE_QUEUE"] || 'user_service_queue',
-    ORDER_SERVICE: process.env["RABBITMQ_ORDER_SERVICE_QUEUE"] || 'order_service_queue',
+    WALLET_SERVICE: process.env["RABBITMQ_WALLET_SERVICE_QUEUE"] || 'wallet_service',
+    USER_SERVICE: process.env["RABBITMQ_USER_SERVICE_QUEUE"] || 'user_service',
+    ORDER_SERVICE: process.env["RABBITMQ_ORDER_SERVICE_QUEUE"] || 'order_service',
+    RESTAURANT_SERVICE: process.env["RABBITMQ_RESTAURANT_SERVICE_QUEUE"] || 'restaurant_service'
   }
 }));

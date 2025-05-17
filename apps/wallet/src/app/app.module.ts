@@ -7,7 +7,14 @@ import {
   ConfigService as FoodOrderConfigService,
 } from '@food-ordering-system/configs';
 import { WalletManagementModule } from '../wallet-management/wallet-management.module';
-import { BaseControlModule, LoggerModule, RmqModule, RMQServiceNames } from '@food-ordering-system/common';
+import { TransactionManagementModule } from '../transaction-management/transaction-management.module';
+import { RmqCommunicateModule } from '../rmq-communication/rmq-communicate.module';
+import {
+  BaseControlModule,
+  LoggerModule,
+  RmqModule,
+  RMQServiceNames,
+} from '@food-ordering-system/common';
 
 @Module({
   imports: [
@@ -25,7 +32,11 @@ import { BaseControlModule, LoggerModule, RmqModule, RMQServiceNames } from '@fo
     }),
 
     RmqModule.register({ name: RMQServiceNames.WALLET_SERVICE }),
+    
+    // Import modules in the correct order to handle circular dependencies
     WalletManagementModule,
+    TransactionManagementModule,
+    RmqCommunicateModule,
   ],
   controllers: [AppController],
   providers: [AppService],
