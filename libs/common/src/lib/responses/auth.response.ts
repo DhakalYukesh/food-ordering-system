@@ -10,6 +10,10 @@ export type RegisterResponse = {
     state: string;
     zipCode: string;
     country: string;
+  },
+  walletId: {
+    id: string;
+    balance: number;
   };
 };
 

@@ -73,18 +73,16 @@ export class RestaurantManagementService {
     }
   }
 
-  async findAllRestaurantsAsync(): Promise<SuccessResponse<Restaurant[]>> {
+  async getRestaurantsAsync(): Promise<SuccessResponse<Restaurant[]>> {
     try {
       this.logger.log('Fetching all active restaurants');
 
-      // Step 1: Query the database for active restaurants
       const restaurants = await this.restaurantRepository.find({
         where: { isActive: true },
       });
 
       this.logger.log(`Found ${restaurants.length} active restaurants`);
 
-      // Step 2: Return the restaurant list with success response
       return {
         statusCode: 200,
         message: 'Restaurants retrieved successfully',
@@ -92,16 +90,100 @@ export class RestaurantManagementService {
       };
     } catch (error) {
       this.logger.error(
-        `Error fetching all restaurants: ${error.message}`,
+        `Error fetching restaurants: ${error.message}`,
         error.stack
       );
       throw new NotFoundException(
-        `Error fetching all restaurants: ${error.message}`
+        `Error fetching restaurants: ${error.message}`
       );
     }
   }
 
-  async findOneRestaurantAsync(
+  async searchByFoodItemAsync(foodItem: string): Promise<SuccessResponse<Restaurant[]>> {
+    try {
+      this.logger.log(`Searching restaurants with food item: ${foodItem}`);
+
+      const restaurants = await this.restaurantRepository.find({
+        where: { isActive: true },
+        relations: ['foodItems'],
+      });
+
+      const filteredRestaurants = restaurants.filter(restaurant => {
+        const matchingFoodItems = restaurant.foodItems.filter(
+          item => item.isAvailable && 
+                 item.name.toLowerCase().includes(foodItem.toLowerCase())
+        );
+        
+        restaurant.foodItems = matchingFoodItems;
+        return matchingFoodItems.length > 0;
+      });
+
+      this.logger.log(`Found ${filteredRestaurants.length} restaurants with food item: ${foodItem}`);
+
+      return {
+        statusCode: 200,
+        message: 'Restaurants with matching food items retrieved successfully',
+        data: filteredRestaurants,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error searching restaurants by food item: ${error.message}`,
+        error.stack
+      );
+      throw new NotFoundException(
+        `Error searching restaurants by food item: ${error.message}`
+      );
+    }
+  }
+
+  async searchFoodsAsync(name: string): Promise<SuccessResponse<string[]>> {
+    try {
+      this.logger.log(`Searching for food items with name: ${name}`);
+
+      const restaurants = await this.restaurantRepository.find({
+        where: { isActive: true },
+        relations: ['foodItems'],
+      });
+
+      const result = [];
+      
+      restaurants.forEach(restaurant => {
+        const matchingFoodItems = restaurant.foodItems.filter(
+          item => item.isAvailable && 
+                 item.name.toLowerCase().includes(name.toLowerCase())
+        );
+        
+        matchingFoodItems.forEach(item => {
+          result.push({
+            restaurantId: restaurant.id,
+            restaurantName: restaurant.name,
+            foodItemId: item.id,
+            foodItemName: item.name,
+            description: item.description,
+            price: item.price,
+          });
+        });
+      });
+
+      this.logger.log(`Found ${result.length} food items matching: ${name}`);
+
+      return {
+        statusCode: 200,
+        message: 'Food items retrieved successfully',
+        data: result,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error searching food items: ${error.message}`,
+        error.stack
+      );
+      throw new NotFoundException(
+        `Error searching food items: ${error.message}`
+      );
+    }
+  }
+
+  async getRestaurantByIdAsync(
     id: string
   ): Promise<SuccessResponse<Restaurant>> {
     try {
@@ -147,7 +229,7 @@ export class RestaurantManagementService {
       this.logger.log(`Updating restaurant with ID: ${id}`);
 
       // Step 1: Find the restaurant to update
-      const restaurantResponse = await this.findOneRestaurantAsync(id);
+      const restaurantResponse = await this.getRestaurantByIdAsync(id);
       const restaurant = restaurantResponse.data;
 
       Object.assign(restaurant, updateRestaurantDto);
@@ -177,12 +259,12 @@ export class RestaurantManagementService {
     }
   }
 
-  async deleteRestaurantAsync(id: string): Promise<SuccessResponse<null>> {
+  async removeRestaurantAsync(id: string): Promise<SuccessResponse<null>> {
     try {
       this.logger.log(`Soft deleting restaurant with ID: ${id}`);
 
       // Step 1: Find the restaurant to delete
-      const restaurantResponse = await this.findOneRestaurantAsync(id);
+      const restaurantResponse = await this.getRestaurantByIdAsync(id);
       const restaurant = restaurantResponse.data;
 
       // Step 2: Perform soft delete by marking as inactive

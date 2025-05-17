@@ -6,7 +6,6 @@ import {
   Param,
   Put,
   Delete,
-  Query,
 } from '@nestjs/common';
 import {
   CheckAccess,
@@ -27,7 +26,7 @@ export class FoodItemController {
 
   @Post()
   @CheckAccess([HasRole.RESTAURANT_OWNER, HasRole.ADMIN])
-  createFoodItemForARestaurant(
+  createFoodItem(
     @Param('restaurantId') restaurantId: string,
     @Body() createFoodItemDto: CreateFoodItemDto
   ) {
@@ -42,7 +41,7 @@ export class FoodItemController {
   }
 
   @Get()
-  findAllFoodItemsForARestaurant(@Param('restaurantId') restaurantId: string) {
+  getFoodItems(@Param('restaurantId') restaurantId: string) {
     this.logger.log(`Fetching all food items for restaurant: ${restaurantId}`);
 
     return this.foodItemService.findAllFoodItemsForARestaurantAsync(
@@ -50,26 +49,24 @@ export class FoodItemController {
     );
   }
 
-  @Get('search')
-  findOneFoodItemForARestaurant(
+  @Get(':id')
+  getFoodItem(
     @Param('restaurantId') restaurantId: string,
-    @Query('id') id?: string,
-    @Query('name') name?: string
+    @Param('id') id: string
   ) {
     this.logger.log(
-      `Searching for food item(s) in restaurant: ${restaurantId}, name: ${name}, id: ${id}`
+      `Fetching food item with id: ${id} for restaurant: ${restaurantId}`
     );
 
     return this.foodItemService.findOneFoodItemForARestaurantAsync(
       restaurantId,
-      id,
-      name
+      id
     );
   }
 
   @Put(':id')
   @CheckAccess([HasRole.RESTAURANT_OWNER, HasRole.ADMIN])
-  updateFoodItemForARestaurant(
+  updateFoodItem(
     @Param('restaurantId') restaurantId: string,
     @Param('id') id: string,
     @Body() updateFoodItemDto: Partial<CreateFoodItemDto>
@@ -87,7 +84,7 @@ export class FoodItemController {
 
   @Delete(':id')
   @CheckAccess([HasRole.RESTAURANT_OWNER, HasRole.ADMIN])
-  removeFoodItemForARestaurant(
+  removeFoodItem(
     @Param('restaurantId') restaurantId: string,
     @Param('id') id: string
   ) {

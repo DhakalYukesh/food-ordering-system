@@ -1,6 +1,6 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { FoodItem } from './entities/food-item.entity';
 import { RestaurantManagementService } from '../restaurant-management/restaurant-management.service';
 import {
@@ -28,7 +28,7 @@ export class FoodItemService {
     try {
       // Step 1: Verify restaurant exists
       const restaurantExistsResp =
-        await this.restaurantManagementService.findOneRestaurantAsync(
+        await this.restaurantManagementService.getRestaurantByIdAsync(
           restaurantId
         );
 
@@ -79,7 +79,7 @@ export class FoodItemService {
     try {
       // Step 1: Verify restaurant exists
       const restaurantExistsResp =
-        await this.restaurantManagementService.findOneRestaurantAsync(
+        await this.restaurantManagementService.getRestaurantByIdAsync(
           restaurantId
         );
 
@@ -126,13 +126,12 @@ export class FoodItemService {
 
   async findOneFoodItemForARestaurantAsync(
     restaurantId: string,
-    id?: string,
-    name?: string
-  ): Promise<SuccessResponse<FoodItem | FoodItem[]>> {
+    id: string
+  ): Promise<SuccessResponse<FoodItem>> {
     try {
       // Step 1: Verify restaurant exists
       const restaurantExistsResp =
-        await this.restaurantManagementService.findOneRestaurantAsync(restaurantId);
+        await this.restaurantManagementService.getRestaurantByIdAsync(restaurantId);
 
       if (!restaurantExistsResp) {
         throw new NotFoundException(
@@ -141,61 +140,29 @@ export class FoodItemService {
       }
 
       this.logger.log(
-        `Fetching food item for restaurant: ${restaurantId}, name: ${name}, id: ${id}`
+        `Fetching food item for restaurant: ${restaurantId}, id: ${id}`
       );
 
       // Step 2: Fetch food item
-      if (id) {
-        this.logger.log(
-          `Searching for food item by ID: ${id} in restaurant: ${restaurantId}`
+      const foodItem = await this.foodItemRepository.findOne({
+        where: { id, restaurant: { id: restaurantId }, isAvailable: true },
+      });
+
+      if (!foodItem) {
+        throw new NotFoundException(
+          `Food item with ID ${id} not found in restaurant ${restaurantId}`
         );
-
-        const foodItem = await this.foodItemRepository.findOne({
-          where: { id, restaurant: { id: restaurantId }, isAvailable: true },
-        });
-
-        if (!foodItem) {
-          throw new NotFoundException(
-            `Food item with ID ${id} not found in restaurant ${restaurantId}`
-          );
-        }
-
-        this.logger.log(
-          `Found food item in restaurant: ${restaurantId}`
-        );
-
-        return {
-          statusCode: 200,
-          message: 'Food item retrieved successfully',
-          data: foodItem,
-        };
-      } else if (name) {
-        this.logger.log(
-          `Searching for food items by name: ${name} in restaurant: ${restaurantId}`
-        );
-
-        const foodItems = await this.foodItemRepository.find({
-          where: { name: ILike(`%${name}%`), restaurant: { id: restaurantId }, isAvailable: true },
-        });
-
-        if (!foodItems || foodItems.length === 0) {
-          throw new NotFoundException(
-            `No food items matching '${name}' found in restaurant ${restaurantId}`
-          );
-        }
-
-        this.logger.log(
-          `Found ${foodItems.length} food items matching '${name}' in restaurant: ${restaurantId}`
-        );
-
-        return {
-          statusCode: 200,
-          message: 'Food items retrieved successfully',
-          data: foodItems,
-        };
-      } else {
-        throw new BadRequestException('Either id or name must be provided');
       }
+
+      this.logger.log(
+        `Found food item in restaurant: ${restaurantId}`
+      );
+
+      return {
+        statusCode: 200,
+        message: 'Food item retrieved successfully',
+        data: foodItem,
+      };
     } catch (error) {
       this.logger.error(
         `Failed to fetch food item for restaurant ${restaurantId}: ${error.message}`
@@ -282,6 +249,35 @@ export class FoodItemService {
       throw new NotFoundException(
         `Failed to remove food item with ID ${id} for restaurant ${restaurantId}: ${error.message}`
       );
+    }
+  }
+
+  async findFoodItemById(id: string): Promise<SuccessResponse<FoodItem>> {
+    try {
+      this.logger.log(`Fetching food item with id: ${id}`);
+
+      const foodItem = await this.foodItemRepository.findOne({
+        where: { id, isAvailable: true },
+      });
+
+      if (!foodItem) {
+        throw new NotFoundException(
+          `Food item with ID ${id} not found`
+        );
+      }
+
+      this.logger.log(`Found food item with id: ${id}`);
+
+      return {
+        statusCode: 200,
+        message: 'Food item retrieved successfully',
+        data: foodItem,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to fetch food item with ID ${id}: ${error.message}`
+      );
+      throw error;
     }
   }
 }

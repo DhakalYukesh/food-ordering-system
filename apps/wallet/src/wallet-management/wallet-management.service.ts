@@ -214,14 +214,20 @@ export class WalletManagementService {
         throw new NotFoundException(`Wallet with ID ${walletId} not found`);
       }
 
+      // Ensure balance is a number
+      const currentBalance = typeof wallet.balance === 'string' 
+        ? parseFloat(wallet.balance) 
+        : wallet.balance;
+      
       // Validate balance is not going negative
-      const newBalance = wallet.balance + amount;
+      const newBalance = currentBalance + amount;
+      
       if (newBalance < 0) {
         throw new BadRequestException('Insufficient funds');
       }
 
       this.logger.log(
-        `Updating wallet balance: ${walletId} from ${wallet.balance} to ${newBalance}`
+        `Updating wallet balance: ${walletId} from ${currentBalance} to ${newBalance}`
       );
 
       // Update balance

@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsString,
   IsUUID,
   Min,
   ValidateNested,
@@ -11,26 +12,24 @@ import { Type } from 'class-transformer';
 import { OrderStatus } from '../../enums';
 
 export class OrderItemDto {
+  @IsString()
   @IsNotEmpty()
-  @IsUUID()
   foodItemId: string;
 
-  @IsNotEmpty()
   @IsNumber()
-  @Min(1)
+  @IsNotEmpty()
   quantity: number;
 }
 
 export class CreateOrderDto {
+  @IsString()
   @IsNotEmpty()
-  @IsUUID()
   userId: string;
 
+  @IsString()
   @IsNotEmpty()
-  @IsUUID()
   restaurantId: string;
 
-  @IsNotEmpty()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
@@ -38,30 +37,29 @@ export class CreateOrderDto {
 }
 
 export class OrderStatusDto {
-  @IsNotEmpty()
   @IsUUID()
+  @IsNotEmpty()
   orderId: string;
 
-  @IsNotEmpty()
   @IsEnum(OrderStatus)
   status: OrderStatus;
 }
 
 export class PaymentDto {
+  @IsString()
   @IsNotEmpty()
-  @IsUUID()
   senderWalletId: string;
 
+  @IsString()
   @IsNotEmpty()
-  @IsUUID()
   receiverWalletId: string;
 
+  @IsString()
   @IsNotEmpty()
-  @IsUUID()
   orderId: string;
 
-  @IsNotEmpty()
   @IsNumber()
+  @IsNotEmpty()
   @Min(0.01)
   amount: number;
 }

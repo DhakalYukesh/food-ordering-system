@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { LoggerService, RMQServiceNames } from '@food-ordering-system/common';
+import { LoggerService, RMQServiceNames, UserMessagePatterns } from '@food-ordering-system/common';
 
 @Injectable()
 export class UserCommunicate {
@@ -16,7 +16,7 @@ export class UserCommunicate {
     try {
       this.logger.log(`Fetching user with ID: ${userId}`);
       return await firstValueFrom(
-        this.userClient.send('get_user', { id: userId })
+        this.userClient.send(UserMessagePatterns.GET_USER, { id: userId })
       );
     } catch (error) {
       this.logger.error(`Error fetching user: ${error.message}`);

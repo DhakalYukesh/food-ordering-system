@@ -2,7 +2,10 @@ import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { MessagePattern, Payload, EventPattern } from '@nestjs/microservices';
 import { OrderManagementService } from './order-management.service';
 import {
+  CheckAccess,
   CreateOrderDto,
+  CurrentUser,
+  HasRole,
   LoggerService,
   OrderMessagePatterns,
   OrderStatus,
@@ -25,12 +28,21 @@ export class OrderManagementController {
     return this.orderService.createOrderAsync(createOrderDto);
   }
 
+  @Get()
+  @CheckAccess()
+  getCurrentUserOrderHistory(@CurrentUser('sub') userId: string) {
+    this.logger.log(`Fetching order history for user ID ${userId}`);
+
+    return this.orderService.getUserOrdersHistoryAsync(userId);
+  }
+
   @Get(':id')
   getOrderHistory(@Param('id') orderId: string) {
     this.logger.log(`Fetching order history for order ID ${orderId}`);
 
     return this.orderService.getOrderHistoryAsync(orderId);
   }
+
 
   @Get('user/:userId')
   getUserOrdersHistory(@Param('userId') userId: string) {

@@ -6,6 +6,7 @@ import {
   Param,
   Put,
   Delete,
+  Query,
 } from '@nestjs/common';
 import {
   CheckAccess,
@@ -13,14 +14,18 @@ import {
   CurrentUser,
   HasRole,
   LoggerService,
+  RestaurantMessagePatterns,
 } from '@food-ordering-system/common';
 import { RestaurantManagementService } from './restaurant-management.service';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { FoodItemService } from '../foodItem/foodItem.service';
 
 @Controller('restaurants')
 export class RestaurantManagementController {
   constructor(
     private readonly logger: LoggerService,
-    private readonly restaurantManagementService: RestaurantManagementService
+    private readonly restaurantManagementService: RestaurantManagementService,
+    private readonly foodItemService: FoodItemService
   ) {
     this.logger.setContext(RestaurantManagementController.name);
   }
@@ -42,17 +47,27 @@ export class RestaurantManagementController {
   }
 
   @Get()
-  async findAllRestaurants() {
+  async getRestaurants() {
     this.logger.log('Fetching all restaurants');
+    return this.restaurantManagementService.getRestaurantsAsync();
+  }
 
-    return this.restaurantManagementService.findAllRestaurantsAsync();
+  @Get('search')
+  async searchByFoodItem(@Query('foodItem') foodItem: string) {
+    this.logger.log(`Searching restaurants with food item: ${foodItem}`);
+    return this.restaurantManagementService.searchByFoodItemAsync(foodItem);
+  }
+
+  @Get('foods/search')
+  async searchFoods(@Query('name') name: string) {
+    this.logger.log(`Searching for food items with name: ${name}`);
+    return this.restaurantManagementService.searchFoodsAsync(name);
   }
 
   @Get(':id')
-  async findOneRestaurant(@Param('id') id: string) {
+  async getRestaurantById(@Param('id') id: string) {
     this.logger.log(`Fetching restaurant with id: ${id}`);
-
-    return this.restaurantManagementService.findOneRestaurantAsync(id);
+    return this.restaurantManagementService.getRestaurantByIdAsync(id);
   }
 
   @Put(':id')
@@ -73,9 +88,42 @@ export class RestaurantManagementController {
 
   @Delete(':id')
   @CheckAccess([HasRole.RESTAURANT_OWNER, HasRole.ADMIN])
-  async deleteRestaurant(@Param('id') id: string) {
+  async removeRestaurant(@Param('id') id: string) {
     this.logger.log(`Deleting restaurant with id: ${id}`);
 
-    return this.restaurantManagementService.deleteRestaurantAsync(id);
+    return this.restaurantManagementService.removeRestaurantAsync(id);
+  }
+
+  // RPC endpoint to get restaurant
+  // This endpoint is called by the order service when a user places an order
+  @MessagePattern(RestaurantMessagePatterns.GET_RESTAURANT)
+  async handleGetRestaurant(@Payload() data: { id: string }) {
+    try {
+      this.logger.log(`RPC: Fetching restaurant with id: ${data.id}`);
+      const responseData = await this.restaurantManagementService.getRestaurantByIdAsync(
+        data.id
+      );
+
+      return responseData.data;
+    } catch (error) {
+      this.logger.error(`RPC: Error fetching restaurant: ${error.message}`);
+      return null;
+    }
+  }
+
+  // RPC endpoint to get food item
+  // This endpoint is called by the order service when a user places an order
+  @MessagePattern(RestaurantMessagePatterns.GET_FOOD_ITEM)
+  async handleGetFoodItem(@Payload() data: { id: string }) {
+    try {
+      this.logger.log(`RPC: Fetching food item with id: ${data.id}`);
+
+      const foodItem = await this.foodItemService.findFoodItemById(data.id);
+
+      return foodItem;
+    } catch (error) {
+      this.logger.error(`RPC: Error fetching food item: ${error.message}`);
+      return null;
+    }
   }
 }

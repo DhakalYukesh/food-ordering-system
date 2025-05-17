@@ -17,12 +17,14 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@food-ordering-system/configs';
 import { UserSession } from './entities/session.entity';
+import { WalletRmqCommunication } from '../rmq-communication/wallet.communicate';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly logger: LoggerService,
     private readonly configService: ConfigService,
+    private readonly walletCommunicateService: WalletRmqCommunication,
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -84,7 +86,33 @@ export class AuthService {
         );
       }
 
-      this.logger.log('User and address saved successfully');
+      // Step 5: Create a wallet for the user
+      const walletResponse = await this.walletCommunicateService.createWallet(
+        savedUser.id,
+        0
+      );
+
+      if (!walletResponse) {
+        this.logger.error('Error creating wallet');
+        throw new HttpException(
+          'Error creating wallet',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      // Step 6: Save the wallet ID in the user entity
+      savedUser.walletId = walletResponse.id;
+      const savedUserWithWallet = await this.userRepository.save(savedUser);
+
+      if (!savedUserWithWallet) {
+        this.logger.error('Error saving user with wallet');
+        throw new HttpException(
+          'Error saving user with wallet',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      this.logger.log('User, Wallet and address saved successfully');
 
       // Step 5: Return the saved user and address
       return {
@@ -102,6 +130,10 @@ export class AuthService {
             state: savedUser.address.state,
             zipCode: savedUser.address.zipCode,
             country: savedUser.address.country,
+          },
+          walletId: {
+            id: walletResponse.id,
+            balance: walletResponse.balance,
           },
         },
       };

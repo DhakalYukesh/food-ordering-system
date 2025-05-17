@@ -15,6 +15,7 @@ export enum RestaurantMessagePatterns {
   CREATE_RESTAURANT = 'create_restaurant',
   UPDATE_RESTAURANT = 'update_restaurant',
   DELETE_RESTAURANT = 'delete_restaurant',
+  GET_FOOD_ITEM = 'get_food_item',
 }
 
 export enum OrderMessagePatterns {

@@ -34,14 +34,26 @@ export class OrderManagementService {
         );
       }
 
+      this.logger.log(`Creating order for user with data: ${user}`);
+
       // 2. Validate restaurant exists - RPC call (synchronous)
-      const restaurant = await this.restaurantCommunicate.getRestaurant(
+      const restaurantResponse = await this.restaurantCommunicate.getRestaurant(
         createOrderDto.restaurantId
       );
 
-      if (!restaurant) {
+      if (!restaurantResponse || !restaurantResponse.data) {
         throw new NotFoundException(
           `Restaurant with ID ${createOrderDto.restaurantId} not found`
+        );
+      }
+
+      const restaurant = restaurantResponse.data;
+      this.logger.log(`Restaurant found: ${JSON.stringify(restaurant)}`);
+      
+      // Check if restaurant owner ID exists
+      if (!restaurant.ownerId) {
+        throw new NotFoundException(
+          `Restaurant with ID ${createOrderDto.restaurantId} has no owner assigned`
         );
       }
 
@@ -50,23 +62,47 @@ export class OrderManagementService {
       const orderItems = [];
 
       for (const item of createOrderDto.items) {
-        const foodItem = await this.restaurantCommunicate.getFoodItem(
+        const foodItemResponse = await this.restaurantCommunicate.getFoodItem(
           item.foodItemId
         );
 
-        if (!foodItem) {
+        this.logger.log(`Food item response: ${JSON.stringify(foodItemResponse)}`);
+        
+        // Handle different possible response structures
+        let foodItem;
+        if (foodItemResponse) {
+          if (foodItemResponse.data) {
+            // Response has data property
+            foodItem = foodItemResponse.data;
+          } else if (foodItemResponse.id) {
+            // Response is the food item directly
+            foodItem = foodItemResponse;
+          } else {
+            // Try to find the object structure
+            this.logger.log("Complex response structure, attempting to extract food item");
+            foodItem = this.extractFoodItem(foodItemResponse);
+          }
+        }
+
+        if (!foodItem || !foodItem.id) {
           throw new NotFoundException(
-            `Food item with ID ${item.foodItemId} not found`
+            `Food item with ID ${item.foodItemId} not found or has invalid format`
           );
         }
 
-        const subtotal = foodItem.price * item.quantity;
+        this.logger.log(`Food item extracted: ${JSON.stringify(foodItem)}`);
+
+        // Make sure price is a number
+        const price = typeof foodItem.price === 'string' ? 
+          parseFloat(foodItem.price) : foodItem.price;
+          
+        const subtotal = price * item.quantity;
         totalAmount += subtotal;
 
         orderItems.push({
           foodItemId: foodItem.id,
           name: foodItem.name,
-          price: foodItem.price,
+          price: price,
           quantity: item.quantity,
           subtotal,
         });
@@ -174,5 +210,41 @@ export class OrderManagementService {
     const updatedOrder = await this.orderRepository.save(order);
 
     return updatedOrder;
+  }
+
+  // Update order with payment ID
+  async updateOrderPaymentAsync(orderId: string, paymentId: string): Promise<Order> {
+    const order = await this.getOrderHistoryAsync(orderId);
+    
+    order.paymentId = paymentId;
+    order.status = OrderStatus.CONFIRMED;
+    
+    this.logger.log(`Updating order ${orderId} with payment ID: ${paymentId}`);
+    const updatedOrder = await this.orderRepository.save(order);
+    
+    return updatedOrder;
+  }
+
+  // Helper method to extract food item from complex responses
+  private extractFoodItem(response) {
+    // Try to find an object with expected food item properties
+    if (typeof response !== 'object' || !response) {
+      return null;
+    }
+    
+    // If the response itself has food item properties, return it
+    if (response.id && response.name && (response.price !== undefined)) {
+      return response;
+    }
+    
+    // Check if any property of the response is a food item
+    for (const key in response) {
+      const value = response[key];
+      if (typeof value === 'object' && value && value.id && value.name && (value.price !== undefined)) {
+        return value;
+      }
+    }
+    
+    return null;
   }
 }

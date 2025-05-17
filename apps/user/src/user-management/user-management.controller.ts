@@ -1,14 +1,22 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { UserManagementService } from './user-management.service';
 import {
   CheckAccess,
   CurrentUser,
   HasRole,
+  LoggerService,
+  UserMessagePatterns,
 } from '@food-ordering-system/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller('users')
 export class UserManagementController {
-  constructor(private readonly userManagementService: UserManagementService) {}
+  constructor(
+    private readonly logger: LoggerService,
+    private readonly userManagementService: UserManagementService
+  ) {
+    this.logger.setContext(UserManagementController.name);
+  }
 
   @Get('me/profile')
   @CheckAccess()
@@ -22,21 +30,17 @@ export class UserManagementController {
     return this.userManagementService.getUserWithWallet(userId);
   }
 
-  @Post('me/wallet')
-  @CheckAccess()
-  async createMyWallet(
-    @CurrentUser('sub') userId: string,
-    @Body('initialBalance') initialBalance = 0
-  ) {
-    return this.userManagementService.createUserWallet(userId, initialBalance);
-  }
-
-  @Post(':id/wallet')
-  @CheckAccess([HasRole.ADMIN])
-  async createUserWallet(
-    @Param('id') userId: string,
-    @Body('initialBalance') initialBalance = 0
-  ) {
-    return this.userManagementService.createUserWallet(userId, initialBalance);
+  // RPC endpoint to get user
+  // This endpoint is called by the order service when a user places an order
+  @MessagePattern(UserMessagePatterns.GET_USER)
+  async handleGetUser(@Payload() data: { id: string }) {
+    this.logger.log(`RPC: Fetching user with ID ${data.id}`);
+    try {
+      const user = await this.userManagementService.getUserWithWallet(data.id);
+      return user;
+    } catch (error) {
+      this.logger.error(`RPC: Error fetching user: ${error.message}`);
+      return null;
+    }
   }
 }

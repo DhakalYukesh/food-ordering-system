@@ -6,7 +6,7 @@ import {
   ConfigsModule as FoodOrderConfigModule,
   ConfigService as FoodOrderConfigService,
 } from '@food-ordering-system/configs';
-import { BaseControlModule, LoggerModule } from '@food-ordering-system/common';
+import { BaseControlModule, LoggerModule, RmqModule, RMQServiceNames } from '@food-ordering-system/common';
 import { RestaurantManagementModule } from '../restaurant-management/restaurant-management.module';
 import { FoodItemModule } from '../foodItem/foodItem.module';
 
@@ -25,8 +25,8 @@ import { FoodItemModule } from '../foodItem/foodItem.module';
         return configService.getDatabaseConfig();
       },
     }),
-    // TODO: Add Rmq registration 
-    // Modules
+
+    RmqModule.register({ name: RMQServiceNames.RESTAURANT_SERVICE }),
     RestaurantManagementModule,
     FoodItemModule,
   ],
