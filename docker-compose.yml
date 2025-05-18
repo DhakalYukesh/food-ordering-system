@@ -19,7 +19,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
+    
   rabbitmq:
     image: rabbitmq:3-management
     container_name: food-ordering-rabbitmq
@@ -40,6 +40,129 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: .
+      dockerfile: ./apps/user/Dockerfile
+    container_name: food-ordering-user-service
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=${NODE_ENV:-dev}
+      - APP_NAME=user-service
+      - APP_PREFIX=${APP_PREFIX:-api/v1}
+      - PORT=3001
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - RABBITMQ_URI=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
+      - RABBITMQ_USER_SERVICE_QUEUE=${RABBITMQ_USER_SERVICE_QUEUE}
+      - RABBITMQ_ORDER_SERVICE_QUEUE=${RABBITMQ_ORDER_SERVICE_QUEUE}
+      - RABBITMQ_RESTAURANT_SERVICE_QUEUE=${RABBITMQ_RESTAURANT_SERVICE_QUEUE}
+      - RABBITMQ_WALLET_SERVICE_QUEUE=${RABBITMQ_WALLET_SERVICE_QUEUE}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - JWT_ACCESS_EXPIRATION=${JWT_ACCESS_EXPIRATION}
+      - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION}
+    networks:
+      - food-ordering-network
+    depends_on:
+      - postgres
+      - rabbitmq
+    restart: unless-stopped
+  
+  order-service:
+    build:
+      context: .
+      dockerfile: ./apps/order/Dockerfile
+    container_name: food-ordering-order-service
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=${NODE_ENV:-dev}
+      - APP_NAME=order-service
+      - APP_PREFIX=${APP_PREFIX:-api/v1}
+      - PORT=3002
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - RABBITMQ_URI=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
+      - RABBITMQ_USER_SERVICE_QUEUE=${RABBITMQ_USER_SERVICE_QUEUE}
+      - RABBITMQ_ORDER_SERVICE_QUEUE=${RABBITMQ_ORDER_SERVICE_QUEUE}
+      - RABBITMQ_RESTAURANT_SERVICE_QUEUE=${RABBITMQ_RESTAURANT_SERVICE_QUEUE}
+      - RABBITMQ_WALLET_SERVICE_QUEUE=${RABBITMQ_WALLET_SERVICE_QUEUE}
+    networks:
+      - food-ordering-network
+    depends_on:
+      - postgres
+      - rabbitmq
+      - user-service
+    restart: unless-stopped
+    
+  restaurant-service:
+    build:
+      context: .
+      dockerfile: ./apps/restaurant/Dockerfile
+    container_name: food-ordering-restaurant-service
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=${NODE_ENV:-dev}
+      - APP_NAME=restaurant-service
+      - APP_PREFIX=${APP_PREFIX:-api/v1}
+      - PORT=3003
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - RABBITMQ_URI=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
+      - RABBITMQ_USER_SERVICE_QUEUE=${RABBITMQ_USER_SERVICE_QUEUE}
+      - RABBITMQ_ORDER_SERVICE_QUEUE=${RABBITMQ_ORDER_SERVICE_QUEUE}
+      - RABBITMQ_RESTAURANT_SERVICE_QUEUE=${RABBITMQ_RESTAURANT_SERVICE_QUEUE}
+      - RABBITMQ_WALLET_SERVICE_QUEUE=${RABBITMQ_WALLET_SERVICE_QUEUE}
+    networks:
+      - food-ordering-network
+    depends_on:
+      - postgres
+      - rabbitmq
+      - user-service
+    restart: unless-stopped
+    
+  wallet-service:
+    build:
+      context: .
+      dockerfile: ./apps/wallet/Dockerfile
+    container_name: food-ordering-wallet-service
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=${NODE_ENV:-dev}
+      - APP_NAME=wallet-service
+      - APP_PREFIX=${APP_PREFIX:-api/v1}
+      - PORT=3004
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - RABBITMQ_URI=amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
+      - RABBITMQ_USER_SERVICE_QUEUE=${RABBITMQ_USER_SERVICE_QUEUE}
+      - RABBITMQ_ORDER_SERVICE_QUEUE=${RABBITMQ_ORDER_SERVICE_QUEUE}
+      - RABBITMQ_RESTAURANT_SERVICE_QUEUE=${RABBITMQ_RESTAURANT_SERVICE_QUEUE}
+      - RABBITMQ_WALLET_SERVICE_QUEUE=${RABBITMQ_WALLET_SERVICE_QUEUE}   
+    networks:
+      - food-ordering-network
+    depends_on:
+      - postgres
+      - rabbitmq
+      - user-service
     restart: unless-stopped
 
 networks:

@@ -104,12 +104,26 @@ npx nx g @nx/nest:resource --project=<service-name> --directory=app --name=<feat
 The services can be containerized and deployed using Docker:
 
 ```bash
-# Build Docker images
-docker-compose build
+# Build and start all services in detached mode
+docker-compose up -d
 
-# Start all services
-docker-compose up
+# View the logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
 ```
+
+### Docker Services
+
+The following services will be available:
+
+- User Service: http://localhost:3001/api/v1
+- Order Service: http://localhost:3002/api/v1
+- Restaurant Service: http://localhost:3003/api/v1
+- Wallet Service: http://localhost:3004/api/v1
+- RabbitMQ Management: http://localhost:15672 (user: yukesh, pass: yukesh)
+- PostgreSQL: localhost:5432
 
 ## License
 
