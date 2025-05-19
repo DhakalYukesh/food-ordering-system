@@ -41,13 +41,13 @@ export class OrderManagementService {
         createOrderDto.restaurantId
       );
 
-      if (!restaurantResponse || !restaurantResponse.data) {
+      if (!restaurantResponse) {
         throw new NotFoundException(
           `Restaurant with ID ${createOrderDto.restaurantId} not found`
         );
       }
 
-      const restaurant = restaurantResponse.data;
+      const restaurant = restaurantResponse;
       this.logger.log(`Restaurant found: ${JSON.stringify(restaurant)}`);
       
       // Check if restaurant owner ID exists
