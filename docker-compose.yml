@@ -142,7 +142,7 @@ services:
       - rabbitmq
       - user-service
     restart: unless-stopped
-    
+  
   wallet-service:
     build:
       context: .
@@ -175,6 +175,22 @@ services:
       - postgres
       - rabbitmq
       - user-service
+    restart: unless-stopped  
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    container_name: food-ordering-api-gateway
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - food-ordering-network
+    depends_on:
+      - user-service
+      - order-service
+      - restaurant-service
+      - wallet-service
     restart: unless-stopped
 
 networks:
@@ -184,3 +200,4 @@ networks:
 volumes:
   postgres_data:
   rabbitmq_data:
+  nginx_config:

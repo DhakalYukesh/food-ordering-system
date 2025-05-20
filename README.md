@@ -10,7 +10,7 @@ This system provides a complete solution for online food ordering, managing rest
 
 The application is structured as a set of independent microservices communicating with each other:
 
-- **API Gateway**: Entry point for all client requests, routing them to appropriate services
+- **API Gateway (Nginx)**: Entry point for all client requests, routing them to appropriate services using Nginx as a reverse proxy
 - **User Service**: Handles user registration, authentication, and profile management
 - **Restaurant Service**: Manages restaurant details, menus, and item availability
 - **Order Service**: Processes order creation, tracking, and history
@@ -46,9 +46,9 @@ cd food-ordering-system
 npm install
 ```
 
-3. Start the development server:
+3. Start the services:
 ```bash
-npx nx serve api-gateway
+docker-compose up -d
 ```
 
 ### Running Individual Services
@@ -56,9 +56,6 @@ npx nx serve api-gateway
 Each service can be run independently:
 
 ```bash
-# API Gateway
-npx nx serve api-gateway
-
 # User Service
 npx nx serve user
 
@@ -79,14 +76,16 @@ npx nx serve wallet
 ```
 food-ordering-system/
 ├── apps/
-│   ├── api-gateway/     # API Gateway service
 │   ├── user/            # User management service
 │   ├── restaurant/      # Restaurant management service
 │   ├── order/           # Order processing service
 │   └── wallet/          # Payment processing service
 ├── libs/
 │   ├── common/          # Shared utilities and models
-│   └── rmq/             # RabbitMQ configurations (if used)
+│   └── auth/            # Authentication helpers
+├── nginx/
+│   ├── nginx.conf       # Main Nginx configuration
+│   └── conf.d/          # Service routing configurations
 ├── docker-compose.yml   # Docker configuration
 └── package.json         # Project dependencies
 ```
