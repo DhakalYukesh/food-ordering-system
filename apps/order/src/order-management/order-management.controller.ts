@@ -22,6 +22,7 @@ export class OrderManagementController {
   }
 
   @Post()
+  @CheckAccess([HasRole.CUSTOMER, HasRole.ADMIN])
   createOrder(@Body() createOrderDto: CreateOrderDto) {
     this.logger.log(`Creating order for user ${createOrderDto.userId}`);
 
@@ -37,6 +38,7 @@ export class OrderManagementController {
   }
 
   @Get(':id')
+  @CheckAccess([HasRole.ADMIN])
   getOrderHistory(@Param('id') orderId: string) {
     this.logger.log(`Fetching order history for order ID ${orderId}`);
 
@@ -45,6 +47,7 @@ export class OrderManagementController {
 
 
   @Get('user/:userId')
+  @CheckAccess([HasRole.ADMIN])
   getUserOrdersHistory(@Param('userId') userId: string) {
     this.logger.log(`Fetching order history for user ID ${userId}`);
 

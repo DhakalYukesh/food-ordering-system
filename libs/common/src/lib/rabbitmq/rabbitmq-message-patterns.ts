@@ -30,4 +30,6 @@ export enum PaymentMessagePatterns {
   PAYMENT_COMPLETED = 'payment_completed',
   PAYMENT_FAILED = 'payment_failed',
   PAYMENT_PENDING = 'payment_pending',
+  PROCESS_ORDER_PAYMENT = 'process_order_payment',
 }
+

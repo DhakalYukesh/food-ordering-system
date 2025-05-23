@@ -5,6 +5,7 @@ import {
   LoggerService,
   TransactionStatus,
   ProcessOrderPaymentDto,
+  PaymentMessagePatterns,
 } from '@food-ordering-system/common';
 import { RmqService } from '@food-ordering-system/common';
 import { OrderCommunicate } from './order.communicate';
@@ -26,7 +27,7 @@ export class WalletPaymentEventController {
 
   // Subscribe to the event for processing order payments
   // This event is emitted by the order service when a user places an order
-  @EventPattern('process_order_payment')
+  @EventPattern(PaymentMessagePatterns.PROCESS_ORDER_PAYMENT)
   async handleOrderPayment(
     @Payload() paymentData: ProcessOrderPaymentDto,
     @Ctx() context: RmqContext

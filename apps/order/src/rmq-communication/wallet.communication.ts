@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { LoggerService, RMQServiceNames } from '@food-ordering-system/common';
+import { LoggerService, PaymentMessagePatterns, RMQServiceNames } from '@food-ordering-system/common';
 
 @Injectable()
 export class WalletCommunicate {
@@ -32,7 +32,7 @@ export class WalletCommunicate {
   }) {
     try {
       this.logger.log(`Requesting payment processing for order: ${paymentData.orderId}`);
-      this.walletClient.emit('process_order_payment', paymentData);
+      this.walletClient.emit(PaymentMessagePatterns.PROCESS_ORDER_PAYMENT, paymentData);
       this.logger.log('Payment request emitted successfully');
     } catch (error) {
       this.logger.error(`Error emitting payment request: ${error.message}`);
